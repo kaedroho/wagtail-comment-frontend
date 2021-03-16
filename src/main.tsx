@@ -80,6 +80,7 @@ export interface InitialComment {
   updated_at: string;
   replies: InitialCommentReply[];
   contentpath: string;
+  position: string;
 }
 /* eslint-enable */
 
@@ -167,13 +168,13 @@ class CommentApp {
     annotation: Annotation,
     commentId: number
   ) {
+    this.attachAnnotationLayout(annotation, commentId);
     this.store.dispatch(
       updateComment(
         commentId,
         {annotation: annotation}
       )
     );
-    this.attachAnnotationLayout(annotation, commentId);
   }
   attachAnnotationLayout(
     annotation: Annotation,
@@ -184,7 +185,7 @@ class CommentApp {
     // const layout engine know the annotation so it would position the comment correctly
     this.layout.setCommentAnnotation(commentId, annotation);
   };
-  makeComment(annotation: Annotation, contentpath: string) {
+  makeComment(annotation: Annotation, contentpath: string, position = '') {
     const commentId = getNextCommentId();
 
     this.attachAnnotationLayout(annotation, commentId);
@@ -194,6 +195,7 @@ class CommentApp {
       addComment(
         newComment(
           contentpath,
+          position,
           commentId,
           annotation,
           this.store.getState().settings.user,
@@ -278,6 +280,7 @@ class CommentApp {
         addComment(
           newComment(
             comment.contentpath,
+            comment.position,
             commentId,
             null,
             { id: comment.user, name: authors.get(String(comment.user)) },
